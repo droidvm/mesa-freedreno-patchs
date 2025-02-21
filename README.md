@@ -19,7 +19,7 @@ patch -p1 < ${DIR_PATCHS}/0013-fix-bad-syscall.patch
 patch -p1 < ${DIR_PATCHS}/0014-freedreno-HACK-GL_ARB_timer_query.patch
 patch -p1 < ${DIR_PATCHS}/0015-termux-x11-kgsl.patch
 
-RLT_DIR=~/mesa-out-arm64"
+RLT_DIR=~/mesa-out-arm64
 DIR_NAME=build-proot-linux-aarch64
 OPTIONS="-Dprefix=${RLT_DIR}/usr -Dbuildtype=release -Dplatforms=x11 \
 -Dgallium-drivers=zink,freedreno \
@@ -30,14 +30,14 @@ OPTIONS="-Dprefix=${RLT_DIR}/usr -Dbuildtype=release -Dplatforms=x11 \
 "
 
 
-echo "正在对源码进行编译前配置。禁用不需要的选项，可以减少编译量 ..." $'\n'
+echo "正在对源码进行编译前配置。禁用不需要的选项，可以减少编译量 ..."
 rm -rf   ${RLT_DIR}
 meson setup  --reconfigure  ${DIR_NAME} ${OPTIONS}
 
-echo "正在编译 ..." $'\n'
+echo "正在编译 ..."
 ninja -C ${DIR_NAME} 2>&1
 
-echo "正在复制编译好的文件 ..." $'\n'
+echo "正在复制编译好的文件 ..."
 ninja -C ${DIR_NAME} install
 
 echo "编译成功，已将文件复制到: ${RLT_DIR}"
