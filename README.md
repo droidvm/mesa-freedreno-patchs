@@ -2,6 +2,7 @@
 kgsl patchs for adreno a6xx/7xx mesa3d, running in proot env
 
 # build
+```bash
 sudo apt-get install -y git patchelf pip zip meson ninja-build flex bison libarchive-dev glslang-tools python3-mako \
 libxcb-randr0-dev  libdrm-dev libxcb-glx0-dev libx11-xcb-dev libxcb-dri3-dev libxcb-present-dev \
 build-essential git python3-mako libdrm-dev libexpat1-dev libwayland-dev \
@@ -40,3 +41,4 @@ echo "正在复制编译好的文件 ..." $'\n'
 ninja -C ${DIR_NAME} install
 
 echo "编译成功，已将文件复制到: ${RLT_DIR}"
+```
