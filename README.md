@@ -50,9 +50,11 @@ echo "编译成功，已将文件复制到: ${RLT_DIR}"
 ```
 
 # run
+```bash
 export LD_LIBRARY_PATH=$RLT_DIR/usr/lib/aarch64-linux-gnu:$RLT_DIR/usr/lib/aarch64-linux-gnu/dri
 export MESA_LOADER_DRIVER_OVERRIDE=kgsl
 export VK_ICD_FILENAMES=$RLT_DIR/usr/share/vulkan/icd.d/freedreno_icd.aarch64.json
 export TU_DEBUG=noconform
 glmark2
 
+```
