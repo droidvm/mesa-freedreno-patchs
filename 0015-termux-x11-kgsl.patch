@@ -337,8 +337,8 @@ index e9eb4d8b796..92166061782 100644
  #ifdef __linux__
     /* Implementation without causing full enumeration of DRM devices. */
     if (loader_get_linux_pci_id_for_fd(fd, vendor_id, chip_id))
---- ./src/x11/loader_x11.hh     2025-02-21 20:50:56.116677371 +0800
-+++ ./src/x11/loader_x11.h      2025-02-21 18:59:20.537987263 +0800
+--- a/src/x11/loader_x11.h      2025-02-21 20:50:56.116677371 +0800
++++ b/src/x11/loader_x11.h      2025-02-21 18:59:20.537987263 +0800
 @@ -26,6 +26,7 @@
  
  #include <xcb/xcb.h>
