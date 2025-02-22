@@ -1,0 +1,103 @@
+diff --git a/src/egl/drivers/dri2/egl_dri2.c b/src/egl/drivers/dri2/egl_dri2.c
+--- a/src/egl/drivers/dri2/egl_dri2.c   2025-02-22 16:42:19.336992938 +0800
++++ b/src/egl/drivers/dri2/egl_dri2.c   2025-02-22 16:43:19.048992915 +0800
+@@ -992,6 +992,9 @@ dri2_setup_device(_EGLDisplay *disp, EGL
+    if (disp->Options.Zink && dri2_dpy->fd_render_gpu < 0)
+       software = true;
+ 
++   if (disp->Options.Kgsl || disp->Options.Zink)
++      software = true;
++
+ 
+    /* Extensions must be loaded before calling this function */
+    assert(dri2_dpy->mesa);
+diff --git a/src/egl/drivers/dri2/platform_drm.c b/src/egl/drivers/dri2/platform_drm.c
+index 813e5d332cb..d08f23afadf 100644
+--- a/src/egl/drivers/dri2/platform_drm.c
++++ b/src/egl/drivers/dri2/platform_drm.c
+@@ -583,6 +583,8 @@ dri2_initialize_drm(_EGLDisplay *disp)
+ 
+          dri2_dpy->fd_display_gpu =
+             loader_open_device(drm->nodes[DRM_NODE_PRIMARY]);
++      } else if (disp->Options.Kgsl) {
++         dri2_dpy->fd_display_gpu = loader_open_device("/dev/kgsl-3d0");
+       } else {
+          _EGLDevice *dev_list = _eglGlobal.DeviceList;
+          drmDevicePtr drm;
+@@ -623,6 +625,8 @@ dri2_initialize_drm(_EGLDisplay *disp)
+    if (!dri2_dpy->gbm_dri->software) {
+       dri2_dpy->fd_render_gpu =
+          get_fd_render_gpu_drm(dri2_dpy->gbm_dri, dri2_dpy->fd_display_gpu);
++      if (dri2_dpy->fd_render_gpu < 0 && disp->Options.Kgsl)
++         dri2_dpy->fd_render_gpu = dri2_dpy->fd_display_gpu;
+       if (dri2_dpy->fd_render_gpu < 0) {
+          err = "DRI2: failed to get compatible render device";
+          goto cleanup;
+diff --git a/src/egl/drivers/dri2/platform_surfaceless.c b/src/egl/drivers/dri2/platform_surfaceless.c
+index 87d06c50656..b6f9c214ede 100644
+--- a/src/egl/drivers/dri2/platform_surfaceless.c
++++ b/src/egl/drivers/dri2/platform_surfaceless.c
+@@ -339,6 +339,20 @@ dri2_initialize_surfaceless(_EGLDisplay *disp)
+       driver_loaded = surfaceless_probe_device_sw(disp);
+    }
+ 
++   if (!driver_loaded && disp->Options.Kgsl) {
++      dri2_dpy->fd_render_gpu = loader_open_device("/dev/kgsl-3d0");
++      dri2_dpy->driver_name = strdup("kgsl");
++      driver_loaded = dri2_load_driver(disp);
++      if (driver_loaded) {
++         dri2_dpy->loader_extensions = image_loader_extensions;
++      } else {
++         free(dri2_dpy->driver_name);
++         dri2_dpy->driver_name = NULL;
++         close(dri2_dpy->fd_render_gpu);
++         dri2_dpy->fd_render_gpu = -1;
++      }
++   }
++
+    if (!driver_loaded) {
+       err = "DRI2: failed to load driver";
+       goto cleanup;
+diff --git a/src/egl/drivers/dri2/platform_wayland.c b/src/egl/drivers/dri2/platform_wayland.c
+index 513d2d0709b..5ba3f70879c 100644
+--- a/src/egl/drivers/dri2/platform_wayland.c
++++ b/src/egl/drivers/dri2/platform_wayland.c
+@@ -2245,8 +2245,12 @@ dri2_initialize_wayland_drm(_EGLDisplay *disp)
+    if (roundtrip(dri2_dpy) < 0)
+       goto cleanup;
+ 
+-   if (!dri2_initialize_wayland_drm_extensions(dri2_dpy))
+-      goto cleanup;
++   if (!dri2_initialize_wayland_drm_extensions(dri2_dpy)) {
++      if (disp->Options.Kgsl)
++         dri2_dpy->fd_render_gpu = loader_open_device("/dev/kgsl-3d0");
++      else
++         goto cleanup;
++   }
+ 
+    loader_get_user_preferred_fd(&dri2_dpy->fd_render_gpu,
+                                 &dri2_dpy->fd_display_gpu);
+diff --git a/src/egl/main/eglapi.c b/src/egl/main/eglapi.c
+index ca5015fe863..d76022aa44a 100644
+--- a/src/egl/main/eglapi.c
++++ b/src/egl/main/eglapi.c
+@@ -693,6 +693,7 @@ eglInitialize(EGLDisplay dpy, EGLint *major, EGLint *minor)
+ 
+       const char *env = os_get_option("MESA_LOADER_DRIVER_OVERRIDE");
+       disp->Options.Zink = env && !strcmp(env, "zink");
++      disp->Options.Kgsl = env && !strcmp(env, "kgsl");
+ 
+       const char *gallium_hud_env = os_get_option("GALLIUM_HUD");
+       disp->Options.GalliumHudWarn =
+diff --git a/src/egl/main/egldisplay.h b/src/egl/main/egldisplay.h
+index d510483e493..5be97838e36 100644
+--- a/src/egl/main/egldisplay.h
++++ b/src/egl/main/egldisplay.h
+@@ -201,6 +201,7 @@ struct _egl_display {
+ 
+    /* options that affect how the driver initializes the display */
+    struct {
++      EGLBoolean Kgsl;           /**< Use kgsl only */
+       EGLBoolean Zink;           /**< Use kopper only */
+       EGLBoolean FallbackZink;   /**< True if zink is tried as fallback */
+       EGLBoolean ForceSoftware;  /**< Use software path only */
