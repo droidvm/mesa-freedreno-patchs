@@ -74,3 +74,11 @@ export TU_DEBUG=noconform
 glmark2
 
 ```
+
+# 注意
+如果将编译好的文件放到别的文件夹
+
+请相应的调整 share/vulkan/icd.d/freedreno_icd.aarch64.json 文件中so库文件的搜索路径
+
+
+
