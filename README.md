@@ -1,6 +1,15 @@
-# mesa-freedreno-patchs
+# mesa-freedreno-patches
 kgsl patchs for adreno a6xx/7xx mesa3d, running in proot env
-目前只测试了 mesa-24.3.0-rc2
+
+# 实测结果
+- 目前只在proot-ubuntu-24.04中测试了 mesa-24.3.0 或 mesa-24.3.0-rc2
+- 其它版本的mesa3d源码，可能要参照 patch 文件手改修补代码才能编译运行
+
+- vulkan.trunip 测试程序：vulkaninfo、vkcube、vkmark 运行正常
+
+- opengl.zink 测试程序：glmark2 测试正常
+
+- opengl.freedreno(kgsl mode) 测试程序：glmark2 测试正常
 
 # ref
 1. vulkan.tunrip patches
