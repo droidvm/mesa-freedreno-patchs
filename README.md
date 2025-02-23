@@ -22,6 +22,9 @@ libxxf86vm-dev bison flex libssl-dev ninja-build meson pkg-config
 
 cd mesa-24.3.0-rc2/
 DIR_PATCHS=~/freedreno-kgsl-patchs
+patch -p1 < ${DIR_PATCHS}/0002-linux-fix-for-getprogname.patch
+patch -p1 < ${DIR_PATCHS}/0003-linux-fix-for-anon-file.patch
+patch -p1 < ${DIR_PATCHS}/0007-linux-dri3.patch
 patch -p1 < ${DIR_PATCHS}/0010-fix-zink.patch
 patch -p1 < ${DIR_PATCHS}/0011-freedreno-drm-kgsl-Add-KGSL-backend-for-freedreno.patch
 patch -p1 < ${DIR_PATCHS}/0012-freedreno-drm-Add-more-APIs-to-per-backend-API.patch
