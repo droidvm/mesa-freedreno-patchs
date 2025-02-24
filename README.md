@@ -1,5 +1,5 @@
 # mesa-freedreno-patches
-kgsl patchs for adreno a6xx/7xx mesa3d, running in proot env
+kgsl patches for adreno a6xx/7xx mesa3d, running in proot env
 
 # 实测结果
 - 目前只在proot-ubuntu-24.04中测试了 mesa-24.3.0 或 mesa-24.3.0-rc2
