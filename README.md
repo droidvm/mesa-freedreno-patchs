@@ -76,9 +76,9 @@ glmark2
 ```
 
 # 注意
-如果将编译好的文件放到别的文件夹
+- 如果将编译好的文件放到别的文件夹，请相应的调整 share/vulkan/icd.d/freedreno_icd.aarch64.json 文件中so库文件的搜索路径
+- 编辑 ~/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml, 将 vblank_mode 参数的值，从auto改为off
 
-请相应的调整 share/vulkan/icd.d/freedreno_icd.aarch64.json 文件中so库文件的搜索路径
 
 
 
